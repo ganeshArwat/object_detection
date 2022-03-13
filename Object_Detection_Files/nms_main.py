@@ -15,22 +15,27 @@ cap.set(3,1280)
 cap.set(4,720)
 cap.set(10,70)
 
-
-while True :
+voice='espeak "detecting object"'
+os.system(voice)
+for k in range(2) :
 
     success,img = cap.read()
 
     className=[]
    # classfile='d1\Object_Detection_Files\coco.names'
-    classfile='coco.names'
+    #classfile='coco.names'
+    classfile='1 object detection/d1/Object_Detection_Files/coco.names'
     with open(classfile , 'rt') as f:
         className=f.read().rstrip('\n').split('\n')
 
     #configPath = 'd1\Object_Detection_Files\ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
     #weightsPath = 'd1\Object_Detection_Files\Frozen_inference_graph.pb'
 
-    configPath = 'ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
-    weightsPath = 'Frozen_inference_graph.pb'
+    #configPath = 'ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
+    #weightsPath = 'Frozen_inference_graph.pb'
+
+    configPath = '1 object detection/d1/Object_Detection_Files/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
+    weightsPath = '1 object detection/d1/Object_Detection_Files/Frozen_inference_graph.pb'
 
 
     net = cv2.dnn_DetectionModel(weightsPath,configPath)
@@ -41,25 +46,34 @@ while True :
 
 
     classIds, confs, bbox = net.detect(img,confThreshold=thres)
-    # print(classIds,bbox)
+    #print(classIds,bbox)
     bbox = list(bbox)
     confs = list(np.array(confs).reshape(1,-1)[0])
     confs = list(map(float,confs))
-    # print(type(confs[0]))
+    #print(type(confs[0]))
     #print(confs)
 
     indices = cv2.dnn.NMSBoxes(bbox,confs,thres,nms_threshold)
-    # print(indices)
+    #print(indices)
 
 
     for i in indices:
         # i=i[0]
-        # print(i)
-        box=bbox[i]
+        #print(i)
+        #print("bbox")
+        #print(bbox.array[i])
+        box=bbox[0]
+        #print(box)
         x,y,w,h = box[0],box[1],box[2],box[3]
         cv2.rectangle(img, (x,y),(x+w,h+y), color=(0, 255, 0), thickness=2)
-        cv2.putText(img,className[classIds[i]-1].upper(),(box[0]+10,box[1]+30),cv2.FONT_HERSHEY_COMPLEX,1,(0,255,0),2)
-        print(className[classIds[i]-1].upper())
+        #print(className)
+        #print(classIds[0][0])
+        cv2.putText(img,className[classIds[0][0]-1].upper(),(box[0]+10,box[1]+30),cv2.FONT_HERSHEY_COMPLEX,1,(0,255,0),2)
+        
+        print(className[classIds[0][0]-1].upper())
+        objectvoice='espeak "'+className[classIds[0][0]-1].upper()+'"'
+        #print(objectvoice)
+        os.system(objectvoice)
 
 
 
@@ -71,7 +85,7 @@ while True :
 
     # print(className)
 
-    cv2.imshow('output',img)
+    #cv2.imshow('output',img)
     # key=cv2.waitKey(1)
     k = cv2.waitKey(33)
     if k==27:    # Esc key to stop
